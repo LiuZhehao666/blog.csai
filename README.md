@@ -27,6 +27,10 @@
 ```markdown
 ![说明](./images/xxx.png)
 ```
+> 如果 `images` 文件夹和当前文档的父级在同一目录下，则为：
+    ```
+    ![说明](../images/xxx.png)
+    ```
 
 例如把图片放到 `Vue/images/demo.png`，就在 `Vue` 相关文档里写：
 
