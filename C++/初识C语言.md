@@ -591,7 +591,156 @@ while (i <= 10) {
 
 **for和while的区别**：
 - 两者功能完全等价，选择哪个主要看哪个更清晰易读
+如：
+```c
+#include <stdio.h>
 
+int main() {
+    int score;
+    int count = 0;           // 统计有效成绩数量
+    int sum = 0;             // 总分
+    int max_count = 100;     // 最多100个成绩
+    
+    printf("请输入成绩（输入负数结束，最多100个）：\n");
+    
+    // 读取第一个成绩
+    scanf("%d", &score);
+    
+    // 循环条件清晰：成绩非负 且 未达到最大数量
+    while (score >= 0 && count < max_count) {
+        // 验证成绩是否有效
+        if (score > 100) {
+            printf("成绩无效（超过100），请重新输入：\n");
+            scanf("%d", &score);
+            continue;  // 跳过本次循环
+        }
+        
+        // 处理有效成绩
+        sum += score;
+        count++;
+        printf("已录入%d个成绩，当前平均分：%.2f\n", 
+               count, (float)sum / count);
+        
+        // 检查是否即将达到上限
+        if (count == max_count) {
+            printf("已达到最大数量限制！\n");
+            break;
+        }
+        
+        // 读取下一个成绩
+        printf("继续输入（还可输入%d个）：", max_count - count);
+        scanf("%d", &score);
+    }
+    
+    // 输出最终统计
+    if (count > 0) {
+        printf("\n======== 统计结果 ========\n");
+        printf("总共录入：%d 个成绩\n", count);
+        printf("总分：%d\n", sum);
+        printf("平均分：%.2f\n", (float)sum / count);
+    } else {
+        printf("没有录入任何成绩。\n");
+    }
+    
+    return 0;
+}
+```
+```c
+#include <stdio.h>
+
+int main() {
+    int score;
+    int count = 0;
+    int sum = 0;
+    int max_count = 100;
+    
+    printf("请输入成绩（输入负数结束，最多100个）：\n");
+    
+    // for循环显得很别扭，初始化和更新逻辑分散
+    for (scanf("%d", &score); 
+         score >= 0 && count < max_count; 
+         printf("继续输入（还可输入%d个）：", max_count - count), scanf("%d", &score)) {
+        
+        // 验证成绩是否有效
+        if (score > 100) {
+            printf("成绩无效（超过100），请重新输入：\n");
+            // 这里需要在for的"更新部分"之外再次读取，逻辑混乱
+            scanf("%d", &score);
+            continue;
+        }
+        
+        sum += score;
+        count++;
+        printf("已录入%d个成绩，当前平均分：%.2f\n", 
+               count, (float)sum / count);
+        
+        if (count == max_count) {
+            printf("已达到最大数量限制！\n");
+            break;
+        }
+    }
+    
+    if (count > 0) {
+        printf("\n======== 统计结果 ========\n");
+        printf("总共录入：%d 个成绩\n", count);
+        printf("总分：%d\n", sum);
+        printf("平均分：%.2f\n", (float)sum / count);
+    } else {
+        printf("没有录入任何成绩。\n");
+    }
+    
+    return 0;
+}
+```
+<mark> 为什么程序员用for更多？<br>
+1. 遍历操作最常见（80%+的循环场景）
+2. 变量作用域更清晰
+3. 现代语言的增强for循环（for-each）
+
+一眼看清循环逻辑: 
+```c
+// for循环：初始化、条件、更新一目了然
+for (int i = 0; i < 100; i++) {
+    // ...
+}
+
+// while循环：需要分开阅读
+int i = 0;      // 这里初始化
+while (i < 100) {  // 这里判断
+    // ...
+    i++;        // 这里更新（可能在循环体任何位置）
+}
+```
+实际使用场景统计:
+
+| 场景类型 | 占比 | 最适合的循环 |
+| --- | --- | --- | 
+| 遍历数组/集合 | 60% |	✅for |
+| 简单计数（做N次） | 20%	| ✅for |
+| 条件不确定（如读取输入） | 15% | ✅while |
+| 至少执行一次 | 5% | ✅do-while |
+
+在某些场景下，while 更合适：
+```c
+// 读取文件直到结尾
+while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    process(buffer);
+}
+
+// 游戏主循环
+while (game_running) {
+    handle_input();
+    update_game();
+    render();
+}
+
+// 网络服务器
+while (true) {
+    client = accept_connection();
+    handle_client(client);
+}
+```
+> <mark>检查到这里了
 ```c
 // 用while读取用户输入，直到输入0为止
 int num;
